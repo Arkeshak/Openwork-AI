@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:16
+
+    container_name: openwork-postgres
+
+    environment:
+      POSTGRES_USER: openwork
+      POSTGRES_PASSWORD: openwork123
+      POSTGRES_DB: openwork_ai
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ../../backend
+
+    container_name: openwork-backend
+
+    environment:
+      DATABASE_URL: postgresql://openwork:openwork123@postgres:5432/openwork_ai
+      OLLAMA_HOST: http://host.docker.internal:11434
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - ../../backend/uploads:/app/uploads
+      - ../../backend/chroma_db:/app/chroma_db
+
+    depends_on:
+      - postgres
+
+  frontend:
+    build:
+      context: ../../frontend
+
+    container_name: openwork-frontend
+
+    ports:
+      - "3000:3000"
+
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

@@ -1,0 +1,47 @@
+# Virtual environments
+backend/venv/
+venv/
+.venv/
+env/
+ENV/
+
+# Python
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node / Next.js
+frontend/node_modules/
+node_modules/
+frontend/.next/
+.next/
+frontend/out/
+out/
+frontend/build/
+build/
+.npm
+.yarn/
+
+# Local databases and uploads
+backend/chroma_db/
+backend/uploads/
+*.db
+*.sqlite3
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env.local
+
+# IDEs and OS files
+.vscode/
+.idea/
+.history/
+.DS_Store
+Thumbs.db
