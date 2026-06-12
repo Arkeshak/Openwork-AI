@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { FileText, Image, File, Trash2, Download, Loader2 } from "lucide-react";
+import { FileText, Image, File, Trash2, Download, Loader2, RefreshCw } from "lucide-react";
 import toast from "react-hot-toast";
 import { api } from "../services/api";
 
@@ -36,6 +36,7 @@ export default function DocumentList({ workspaceId, refresh }: Props) {
   const [docs, setDocs] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [pendingId, setPendingId] = useState<number | null>(null);
+  const [reindexingId, setReindexingId] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -74,6 +75,19 @@ export default function DocumentList({ workspaceId, refresh }: Props) {
       await load();
     } catch {
       toast.error("Failed to delete");
+    }
+  };
+
+  const reindex = async (id: number) => {
+    try {
+      setReindexingId(id);
+      await api.post(`/documents/${id}/reingest`);
+      toast.success("Document re-indexed successfully!");
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      toast.error(msg || "Re-index failed. Try re-uploading the file.");
+    } finally {
+      setReindexingId(null);
     }
   };
 
@@ -124,7 +138,7 @@ export default function DocumentList({ workspaceId, refresh }: Props) {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "32px 1fr 90px 90px 100px",
+          gridTemplateColumns: "32px 1fr 90px 90px 120px",
           padding: "6px 12px",
           borderBottom: "var(--bd)",
           background: "var(--coal)",
@@ -142,7 +156,7 @@ export default function DocumentList({ workspaceId, refresh }: Props) {
           className="animate-fade-up"
           style={{
             display: "grid",
-            gridTemplateColumns: "32px 1fr 90px 90px 100px",
+            gridTemplateColumns: "32px 1fr 90px 90px 120px",
             alignItems: "center",
             padding: "0 12px",
             minHeight: 52,
@@ -220,6 +234,17 @@ export default function DocumentList({ workspaceId, refresh }: Props) {
               </>
             ) : (
               <>
+                <button
+                  onClick={() => reindex(doc.id)}
+                  className="ed-btn ed-btn-ghost ed-btn-icon"
+                  title="Re-index into AI"
+                  disabled={reindexingId === doc.id}
+                  style={{ color: "var(--amber)" }}
+                >
+                  {reindexingId === doc.id
+                    ? <Loader2 size={12} className="animate-spin" />
+                    : <RefreshCw size={12} />}
+                </button>
                 <a
                   href={`${process.env.NEXT_PUBLIC_API_URL || "/api"}/documents/${doc.id}/download`}
                   target="_blank"

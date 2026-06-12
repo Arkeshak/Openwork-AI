@@ -351,11 +351,11 @@ def rag_debug(
 
     # 1. Retrieve raw results
     search_results = RAGService.search(payload.question, payload.workspace_id, top_k=3)
-    
-    documents = search_results.get("documents", [[]])[0]
-    distances = search_results.get("distances", [[]])[0]
-    metadatas = search_results.get("metadatas", [[]])[0]
-    
+
+    documents = (search_results.get("documents") or [[]])[0] if search_results else []
+    distances = (search_results.get("distances") or [[]])[0] if search_results else []
+    metadatas = (search_results.get("metadatas") or [[]])[0] if search_results else []
+
     # 2. Format context and retrieved chunks
     retrieved_chunks = []
     for doc, dist, meta in zip(documents, distances, metadatas):
@@ -364,7 +364,7 @@ def rag_debug(
             "score": dist,
             "metadata": meta
         })
-        
+
     context = "\n\n".join(documents)
     
     # 3. Construct prompt exactly as AIService does

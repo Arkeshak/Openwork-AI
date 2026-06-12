@@ -1,3 +1,5 @@
+from typing import Any, Optional, cast
+
 from app.rag.chunker import chunk_text
 from app.rag.embedder import embed_text
 from app.rag.vector_store import get_collection
@@ -23,10 +25,10 @@ class RAGService:
         print(f"RAGService: Ingesting {len(chunks)} chunks for {filename} (workspace {workspace_id})")
 
         # Batch operations
-        ids = []
-        documents = []
-        embeddings = []
-        metadatas = []
+        ids: list[str] = []
+        documents: list[str] = []
+        embeddings: list[list[float]] = []
+        metadatas: list[dict[str, str | int | float | bool | None]] = []
 
         for i, chunk in enumerate(chunks):
             chunk_id = f"{workspace_id}-{uuid4()}-{i}"
@@ -36,17 +38,17 @@ class RAGService:
             metadatas.append({
                 "workspace_id": workspace_id,
                 "filename": filename,
-                "chunk_id": chunk_id
+                "chunk_id": chunk_id,
             })
 
         # Add all chunks at once
         collection.add(
             ids=ids,
             documents=documents,
-            embeddings=embeddings,
-            metadatas=metadatas
+            embeddings=cast(Any, embeddings),
+            metadatas=cast(Any, metadatas),
         )
-        
+
         print(f"RAGService: Successfully ingested {len(chunks)} chunks into ChromaDB.")
 
         return {
@@ -60,34 +62,71 @@ class RAGService:
         top_k: int = 4
     ):
         collection = get_collection()
+        query_embedding = embed_text(query)
 
-        results = collection.query(
-            query_embeddings=[
-                embed_text(query)
-            ],
-            n_results=top_k,
-            where={
-                "workspace_id": workspace_id
-            },
-            include=["documents", "distances", "metadatas"]
-        )
+        # Try with workspace_id filter first (works when all metadata is set)
+        try:
+            results = collection.query(
+                query_embeddings=[query_embedding],
+                n_results=top_k,
+                where={"workspace_id": workspace_id},
+                include=["documents", "distances", "metadatas"]
+            )
+            # Verify we actually got results
+            docs = results.get("documents") or [[]]
+            if docs[0]:
+                return results
+        except Exception as e:
+            print(f"RAGService: filtered search error: {e}")
 
-        return results
+        # Fallback: fetch more results and post-filter by workspace_id
+        try:
+            total = collection.count()
+            fetch_k = min(total, max(top_k * 10, 50))
+            results = collection.query(
+                query_embeddings=[query_embedding],
+                n_results=fetch_k,
+                include=["documents", "distances", "metadatas"]
+            )
+            docs = results.get("documents", [[]])[0] or []
+            dists = results.get("distances", [[]])[0] or []
+            metas = results.get("metadatas", [[]])[0] or []
+
+            filtered_docs, filtered_dists, filtered_metas = [], [], []
+            for d, dist, m in zip(docs, dists, metas):
+                if m and m.get("workspace_id") == workspace_id:
+                    filtered_docs.append(d)
+                    filtered_dists.append(dist)
+                    filtered_metas.append(m)
+                    if len(filtered_docs) >= top_k:
+                        break
+
+            return {
+                "documents": [filtered_docs],
+                "distances": [filtered_dists],
+                "metadatas": [filtered_metas],
+            }
+        except Exception as e:
+            print(f"RAGService: fallback search error: {e}")
+            return {"documents": [[]], "distances": [[]], "metadatas": [[]]}
 
     @staticmethod
     def retrieve_context(
         query: str,
         workspace_id: int,
-        search_query: str = None,
+        search_query: Optional[str] = None,
         top_k: int = 4
     ):
         actual_query = search_query if search_query is not None else query
         
         results = RAGService.search(actual_query, workspace_id, top_k)
 
-        documents = results.get("documents", [[]])[0]
-        distances = results.get("distances", [[]])[0]
-        metadatas = results.get("metadatas", [[]])[0]
+        if not results:
+            return ""
+
+        documents = (results.get("documents") or [[]])[0]
+        distances = (results.get("distances") or [[]])[0]
+        metadatas = (results.get("metadatas") or [[]])[0]
         
         context = "\n\n".join(documents)
         

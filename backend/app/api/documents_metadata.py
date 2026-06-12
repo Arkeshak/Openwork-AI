@@ -12,6 +12,7 @@ from app.services.rag_service import RAGService
 
 import shutil
 import os
+import uuid
 
 router = APIRouter()
 
@@ -102,17 +103,20 @@ def upload_document_legacy(
 
     upload_dir = "uploads"
     os.makedirs(upload_dir, exist_ok=True)
-    file_path = os.path.join(upload_dir, file.filename)
+    # Use a UUID prefix to avoid overwriting files with the same original name
+    unique_filename = f"{uuid.uuid4().hex}_{file.filename}"
+    file_path = os.path.join(upload_dir, unique_filename)
 
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
+    actual_size = os.path.getsize(file_path)
     document = Document(
         filename=file.filename,
         file_path=file_path,
         workspace_id=workspace_id,
         uploaded_by=user["user_id"],
-        file_size=getattr(file, "size", None),
+        file_size=actual_size,
         content_type=file.content_type
     )
     db.add(document)
@@ -156,25 +160,28 @@ def upload_document_to_workspace(
 
     upload_dir = "uploads"
     os.makedirs(upload_dir, exist_ok=True)
-    file_path = os.path.join(upload_dir, file.filename)
+    # Use a UUID prefix to avoid overwriting files with the same original name
+    unique_filename = f"{uuid.uuid4().hex}_{file.filename}"
+    file_path = os.path.join(upload_dir, unique_filename)
 
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
+
+    actual_size = os.path.getsize(file_path)
+    print("FILE SAVED:", file_path)
+    print("FILE SIZE:", actual_size)
 
     document = Document(
         filename=file.filename,
         file_path=file_path,
         workspace_id=workspace_id,
         uploaded_by=user["user_id"],
-        file_size=getattr(file, "size", None),
+        file_size=actual_size,
         content_type=file.content_type
     )
     db.add(document)
     db.commit()
     db.refresh(document)
-
-    print("FILE SAVED:", file_path)
-    print("FILE SIZE:", os.path.getsize(file_path))
 
     try:
         text = load_document(file_path)
@@ -212,3 +219,41 @@ def download_document(
         return {"error": "Access denied"}
 
     return FileResponse(path=document.file_path, filename=document.filename)
+
+
+# ── Re-ingest a document into ChromaDB ───────────────────────────────────────
+
+@router.post("/documents/{document_id}/reingest")
+def reingest_document(
+    document_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    document = db.query(Document).filter(Document.id == document_id).first()
+    if not document:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    workspace = db.query(Workspace).filter(Workspace.id == document.workspace_id).first()
+    if not workspace or workspace.user_id != user["user_id"]:
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    if not document.file_path or not os.path.exists(document.file_path):
+        raise HTTPException(status_code=404, detail="File not found on disk. Please re-upload.")
+
+    try:
+        text = load_document(document.file_path)
+        if not text or not text.strip():
+            raise HTTPException(status_code=422, detail="Could not extract text from document.")
+
+        RAGService.ingest_text(text, document.workspace_id, filename=document.filename)
+        return {
+            "message": "Re-ingested successfully",
+            "document_id": document_id,
+            "filename": document.filename,
+            "workspace_id": document.workspace_id,
+            "chars_extracted": len(text),
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ingestion failed: {str(e)}")

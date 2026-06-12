@@ -57,7 +57,7 @@ Standalone Query:"""
         history = messages[:-1]
         latest_message = messages[-1]
 
-        gemini_history = []
+        gemini_history: list[dict[str, str | list[str]]] = []
         for msg in history:
             role = "user" if msg["role"] == "user" else "model"
             gemini_history.append({
@@ -67,8 +67,9 @@ Standalone Query:"""
 
         try:
             import google.generativeai as genai
+            from typing import cast, Any
             model = genai.GenerativeModel("gemini-2.5-flash")
-            chat = model.start_chat(history=gemini_history)
+            chat = model.start_chat(history=cast(Any, gemini_history))
             response = chat.send_message(latest_message["content"])
             logger.debug(f"AIService chat_with_history response: {response.text[:200]}...")
             return response.text

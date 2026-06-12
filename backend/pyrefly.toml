@@ -1,0 +1,8 @@
+# Pyrefly configuration for OpenWork-AI backend
+# https://pyrefly.org/en/stable/configuration/
+
+python_interpreter = "venv/Scripts/python.exe"
+
+[project]
+include = ["."]
+exclude = ["venv/**"]

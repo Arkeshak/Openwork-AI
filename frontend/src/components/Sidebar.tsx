@@ -2,12 +2,11 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutGrid, FolderOpen, Settings, LogOut, Menu, X } from "lucide-react";
+import { LayoutGrid, Settings, LogOut, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const nav = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutGrid, scrollTo: null },
-  { href: "/dashboard", label: "Workspaces", icon: FolderOpen, scrollTo: "workspaces" },
   { href: "/settings", label: "Settings", icon: Settings, scrollTo: null },
 ];
 
@@ -133,16 +132,6 @@ export default function Sidebar() {
         AI Platform
       </div>
 
-      {/* Nav section label */}
-      <div
-        style={{
-          padding: "16px 24px 8px",
-        }}
-      >
-        <span className="label" style={{ fontSize: "0.58rem", letterSpacing: "0.18em" }}>
-          Navigation
-        </span>
-      </div>
 
       {/* Nav items */}
       <nav style={{ flex: 1, paddingBottom: 16 }}>

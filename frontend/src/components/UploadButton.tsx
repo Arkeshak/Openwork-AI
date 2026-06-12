@@ -34,7 +34,6 @@ export default function UploadButton({ workspaceId, onUpload }: Props) {
       setLastFile(null);
 
       await api.post(`/workspaces/${workspaceId}/documents`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (e) => {
           if (e.total) setProgress(Math.round((e.loaded / e.total) * 100));
         },

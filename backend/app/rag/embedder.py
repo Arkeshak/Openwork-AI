@@ -1,3 +1,5 @@
+from typing import List
+
 from sentence_transformers import SentenceTransformer
 
 model = SentenceTransformer(
@@ -5,5 +7,5 @@ model = SentenceTransformer(
 )
 
 
-def embed_text(text: str):
+def embed_text(text: str) -> List[float]:
     return model.encode(text).tolist()
