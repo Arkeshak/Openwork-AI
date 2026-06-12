@@ -46,6 +46,8 @@ app = FastAPI(
 )
 
 origins = [origin.strip() for origin in settings.CORS_ORIGINS.split(",") if origin.strip()]
+if "https://openwork-ai-dusky.vercel.app" not in origins:
+    origins.append("https://openwork-ai-dusky.vercel.app")
 
 app.add_middleware(
     CORSMiddleware,
