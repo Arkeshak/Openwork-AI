@@ -1,7 +1,18 @@
 {
   "venvPath": "backend",
   "venv": "venv",
+  "pythonVersion": "3.10",
+  "pythonPlatform": "Windows",
   "extraPaths": [
+    "backend",
+    "backend/venv/Lib/site-packages"
+  ],
+  "include": [
     "backend"
+  ],
+  "exclude": [
+    "backend/venv",
+    "frontend",
+    "**/node_modules"
   ]
 }
