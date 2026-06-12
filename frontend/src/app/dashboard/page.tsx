@@ -2,8 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Plus, ArrowRight, Trash2, X, Loader2, FolderOpen, MessageSquare } from "lucide-react";
+import { Plus, ArrowRight, Trash2, X, Loader2, MessageSquare } from "lucide-react";
 import toast from "react-hot-toast";
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/layout/Navbar";
@@ -81,31 +80,21 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "var(--ink)" }}>
+    <div className="dashboard-root">
       <Sidebar />
 
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+      <div className="dashboard-body">
         <Navbar title="Dashboard" />
 
-        <main style={{ flex: 1, padding: "0" }}>
+        <main style={{ flex: 1 }}>
 
           {/* ── Stats row ── */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
-              borderBottom: "var(--bd)",
-            }}
-          >
+          <div className="stats-grid">
             {stats.map((s, i) => (
               <div
                 key={s.label}
-                className="animate-fade-up"
-                style={{
-                  padding: "28px 32px",
-                  borderRight: i < 3 ? "var(--bd)" : "none",
-                  animationDelay: `${i * 0.06}s`,
-                }}
+                className="stat-cell animate-fade-up"
+                style={{ animationDelay: `${i * 0.06}s` }}
               >
                 <div className="label" style={{ marginBottom: 10 }}>{s.label}</div>
                 {loading ? (
@@ -115,7 +104,7 @@ export default function DashboardPage() {
                     style={{
                       fontFamily: "var(--font-display)",
                       fontWeight: 900,
-                      fontSize: "clamp(2.5rem, 4vw, 4rem)",
+                      fontSize: "clamp(2rem, 5vw, 4rem)",
                       lineHeight: 1,
                       color: i === 0 ? "var(--amber)" : "var(--cream)",
                       letterSpacing: "-0.03em",
@@ -129,10 +118,10 @@ export default function DashboardPage() {
           </div>
 
           {/* ── Content grid ── */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 320px" }}>
+          <div className="content-grid">
 
             {/* ── Workspace index ── */}
-            <div id="workspaces" style={{ borderRight: "var(--bd)", minHeight: "calc(100vh - 180px)" }}>
+            <div id="workspaces" className="workspace-panel">
 
               {/* Header row */}
               <div
@@ -140,8 +129,10 @@ export default function DashboardPage() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  padding: "20px 32px",
+                  padding: "20px 24px",
                   borderBottom: "var(--bd)",
+                  flexWrap: "wrap",
+                  gap: 12,
                 }}
               >
                 <div className="flex items-center gap-3">
@@ -149,7 +140,7 @@ export default function DashboardPage() {
                     style={{
                       fontFamily: "var(--font-display)",
                       fontWeight: 900,
-                      fontSize: "1.4rem",
+                      fontSize: "clamp(1rem, 3vw, 1.4rem)",
                       textTransform: "uppercase",
                       letterSpacing: "-0.02em",
                       color: "var(--cream)",
@@ -183,14 +174,14 @@ export default function DashboardPage() {
               ) : data?.recent_workspaces?.length === 0 ? (
                 <div
                   style={{
-                    padding: "80px 32px",
+                    padding: "60px 24px",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "flex-start",
                     gap: 16,
                   }}
                 >
-                  <div style={{ fontFamily: "var(--font-display)", fontSize: "5rem", lineHeight: 1, color: "var(--char)", fontWeight: 900, textTransform: "uppercase" }}>
+                  <div style={{ fontFamily: "var(--font-display)", fontSize: "clamp(3rem, 8vw, 5rem)", lineHeight: 1, color: "var(--char)", fontWeight: 900, textTransform: "uppercase" }}>
                     Empty
                   </div>
                   <p style={{ color: "var(--mist)", fontSize: "var(--text-sm)", maxWidth: 340 }}>
@@ -202,16 +193,8 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div>
-                  {/* Column labels */}
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "48px 1fr 120px 80px",
-                      padding: "8px 32px",
-                      borderBottom: "var(--bd)",
-                      background: "var(--coal)",
-                    }}
-                  >
+                  {/* Column labels — hidden on very small screens */}
+                  <div className="workspace-table-header">
                     {["#", "Name / Description", "Created", "Actions"].map((h) => (
                       <div key={h} className="label" style={{ fontSize: "0.58rem" }}>{h}</div>
                     ))}
@@ -220,19 +203,9 @@ export default function DashboardPage() {
                   {data?.recent_workspaces.map((w, i) => (
                     <div
                       key={w.id}
-                      className="animate-fade-up"
+                      className="workspace-row animate-fade-up"
                       onClick={() => router.push(`/workspace/${w.id}`)}
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "48px 1fr 120px 80px",
-                        alignItems: "center",
-                        padding: "0 32px",
-                        minHeight: 68,
-                        borderBottom: "var(--bd)",
-                        transition: "background 0.15s",
-                        animationDelay: `${i * 0.05}s`,
-                        cursor: "pointer",
-                      }}
+                      style={{ animationDelay: `${i * 0.05}s` }}
                       onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--coal)")}
                       onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}
                     >
@@ -249,7 +222,7 @@ export default function DashboardPage() {
                       </div>
 
                       {/* Name + Description */}
-                      <div>
+                      <div style={{ minWidth: 0 }}>
                         <div
                           style={{
                             fontFamily: "var(--font-body)",
@@ -269,7 +242,6 @@ export default function DashboardPage() {
                               overflow: "hidden",
                               textOverflow: "ellipsis",
                               whiteSpace: "nowrap",
-                              maxWidth: 320,
                             }}
                           >
                             {w.description}
@@ -279,6 +251,7 @@ export default function DashboardPage() {
 
                       {/* Date */}
                       <div
+                        className="ws-date-col"
                         style={{
                           fontFamily: "var(--font-mono)",
                           fontSize: "0.65rem",
@@ -296,14 +269,14 @@ export default function DashboardPage() {
                         <button
                           onClick={() => router.push(`/workspace/${w.id}`)}
                           className="ed-btn ed-btn-ghost ed-btn-icon"
-                          title="Open"
+                          title="Open workspace"
                         >
                           <ArrowRight size={13} />
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); deleteWorkspace(w.id); }}
                           className="ed-btn ed-btn-ghost ed-btn-icon"
-                          title="Delete"
+                          title="Delete workspace"
                           style={{ color: "var(--ember)" }}
                         >
                           <Trash2 size={13} />
@@ -316,7 +289,7 @@ export default function DashboardPage() {
             </div>
 
             {/* ── Right column: recent chats + info ── */}
-            <div>
+            <div className="right-panel">
               {/* Recent chats */}
               <div style={{ padding: "20px 24px", borderBottom: "var(--bd)" }}>
                 <div className="flex items-center gap-2" style={{ marginBottom: 16 }}>
@@ -446,7 +419,7 @@ export default function DashboardPage() {
             >
               <div>
                 <div className="label" style={{ color: "var(--amber)", marginBottom: 4 }}>◆ New Record</div>
-                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "1.6rem", fontWeight: 900, textTransform: "uppercase", lineHeight: 1, color: "var(--cream)" }}>
+                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.2rem, 5vw, 1.6rem)", fontWeight: 900, textTransform: "uppercase", lineHeight: 1, color: "var(--cream)" }}>
                   Create Workspace
                 </h2>
               </div>
@@ -508,6 +481,131 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      <style>{`
+        .dashboard-root {
+          display: flex;
+          min-height: 100vh;
+          background: var(--ink);
+        }
+        .dashboard-body {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+        }
+
+        /* Stats grid: 4 columns on desktop, 2 on tablet, 2 on mobile */
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          border-bottom: var(--bd);
+        }
+        .stat-cell {
+          padding: 28px 24px;
+        }
+        .stat-cell:not(:last-child) {
+          border-right: var(--bd);
+        }
+
+        /* Content grid: sidebar + right panel on desktop, stacked on mobile */
+        .content-grid {
+          display: grid;
+          grid-template-columns: 1fr 300px;
+        }
+        .workspace-panel {
+          border-right: var(--bd);
+          min-height: calc(100vh - 180px);
+        }
+        .right-panel {
+          min-width: 0;
+        }
+
+        /* Workspace table header */
+        .workspace-table-header {
+          display: grid;
+          grid-template-columns: 48px 1fr 120px 80px;
+          padding: 8px 24px;
+          border-bottom: var(--bd);
+          background: var(--coal);
+        }
+        .workspace-row {
+          display: grid;
+          grid-template-columns: 48px 1fr 120px 80px;
+          align-items: center;
+          padding: 0 24px;
+          min-height: 68px;
+          border-bottom: var(--bd);
+          transition: background 0.15s;
+          cursor: pointer;
+        }
+
+        /* ── Tablet (≤900px): hide right panel inline, stack below ── */
+        @media (max-width: 900px) {
+          .content-grid {
+            grid-template-columns: 1fr;
+          }
+          .workspace-panel {
+            border-right: none;
+            border-bottom: var(--bd);
+            min-height: unset;
+          }
+          .right-panel {
+            border-top: none;
+          }
+        }
+
+        /* ── Mobile (≤600px) ── */
+        @media (max-width: 600px) {
+          .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+          .stat-cell {
+            padding: 20px 16px;
+          }
+          .stat-cell:nth-child(2) {
+            border-right: none;
+          }
+          .stat-cell:nth-child(1),
+          .stat-cell:nth-child(2) {
+            border-bottom: var(--bd);
+          }
+
+          /* Workspace table: hide # column and date column on mobile */
+          .workspace-table-header {
+            grid-template-columns: 1fr 80px;
+            padding: 8px 16px;
+          }
+          .workspace-table-header > *:nth-child(1),
+          .workspace-table-header > *:nth-child(3) {
+            display: none;
+          }
+          .workspace-row {
+            grid-template-columns: 1fr 80px;
+            padding: 0 16px;
+          }
+          .workspace-row > *:nth-child(1),
+          .workspace-row > *:nth-child(3) {
+            display: none;
+          }
+          .ws-date-col {
+            display: none;
+          }
+
+          /* Push hamburger menu spacing in mobile navbar */
+          .dashboard-body > header {
+            padding-left: 52px;
+          }
+        }
+
+        @keyframes scale-in {
+          from { opacity: 0; transform: scale(0.95); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+        .animate-scale-in {
+          animation: scale-in 0.2s ease both;
+        }
+      `}</style>
     </div>
   );
 }

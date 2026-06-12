@@ -1,33 +1,67 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { LayoutGrid, FolderOpen, Settings, LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { LayoutGrid, FolderOpen, Settings, LogOut, Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const nav = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
-  { href: "/dashboard#workspaces", label: "Workspaces", icon: FolderOpen },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutGrid, scrollTo: null },
+  { href: "/dashboard", label: "Workspaces", icon: FolderOpen, scrollTo: "workspaces" },
+  { href: "/settings", label: "Settings", icon: Settings, scrollTo: null },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [open, setOpen] = useState(false);
+
+  // Close sidebar on route change
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  // Prevent body scroll when sidebar open on mobile
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
 
   const logout = () => {
     localStorage.removeItem("token");
     router.push("/login");
   };
 
-  return (
+  const handleNavClick = (item: typeof nav[0]) => {
+    setOpen(false);
+    if (item.scrollTo) {
+      // Navigate to dashboard first, then scroll to section
+      if (pathname !== "/dashboard") {
+        router.push("/dashboard");
+        // After navigation, scroll to section
+        setTimeout(() => {
+          const el = document.getElementById(item.scrollTo!);
+          if (el) el.scrollIntoView({ behavior: "smooth" });
+        }, 300);
+      } else {
+        const el = document.getElementById(item.scrollTo);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      router.push(item.href);
+    }
+  };
+
+  const SidebarContent = () => (
     <aside
       style={{
         width: 220,
         flexShrink: 0,
-        height: "100vh",
-        position: "sticky",
-        top: 0,
+        height: "100%",
         background: "var(--coal)",
         borderRight: "var(--bd)",
         display: "flex",
@@ -40,6 +74,9 @@ export default function Sidebar() {
         style={{
           padding: "20px 24px 18px",
           borderBottom: "var(--bd)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
         <div className="flex items-center gap-2">
@@ -67,19 +104,33 @@ export default function Sidebar() {
             </span>
           </Link>
         </div>
-        <div
+        {/* Mobile close button inside sidebar */}
+        <button
+          className="sidebar-close-btn"
+          onClick={() => setOpen(false)}
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "0.6rem",
-            textTransform: "uppercase",
-            letterSpacing: "0.18em",
-            color: "var(--sand)",
-            marginTop: 6,
-            paddingLeft: 18,
+            background: "none",
+            border: "none",
+            color: "var(--mist)",
+            cursor: "pointer",
+            display: "none",
+            padding: 4,
           }}
         >
-          AI Platform
-        </div>
+          <X size={16} />
+        </button>
+      </div>
+      <div
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: "0.6rem",
+          textTransform: "uppercase",
+          letterSpacing: "0.18em",
+          color: "var(--sand)",
+          padding: "6px 24px 0 42px",
+        }}
+      >
+        AI Platform
       </div>
 
       {/* Nav section label */}
@@ -98,19 +149,19 @@ export default function Sidebar() {
         {nav.map((item) => {
           const Icon = item.icon;
           const isActive =
-            pathname === item.href ||
-            (item.href !== "/" && !item.href.includes("#") && pathname.startsWith(item.href));
+            pathname === item.href &&
+            !item.scrollTo ||
+            (item.href !== "/" && !item.scrollTo && pathname.startsWith(item.href));
           return (
-            <Link
+            <button
               key={item.href + item.label}
-              href={item.href}
-              style={{ textDecoration: "none" }}
+              onClick={() => handleNavClick(item)}
+              className={`nav-item ${isActive ? "active" : ""}`}
+              style={{ border: "none" }}
             >
-              <div className={`nav-item ${isActive ? "active" : ""}`}>
-                <Icon size={13} style={{ flexShrink: 0 }} />
-                {item.label}
-              </div>
-            </Link>
+              <Icon size={13} style={{ flexShrink: 0 }} />
+              {item.label}
+            </button>
           );
         })}
       </nav>
@@ -135,5 +186,74 @@ export default function Sidebar() {
         </div>
       </div>
     </aside>
+  );
+
+  return (
+    <>
+      {/* Desktop sidebar — always visible */}
+      <div className="sidebar-desktop">
+        <SidebarContent />
+      </div>
+
+      {/* Mobile hamburger button */}
+      <button
+        className="sidebar-hamburger"
+        onClick={() => setOpen(true)}
+        aria-label="Open menu"
+        style={{
+          position: "fixed",
+          top: 10,
+          left: 12,
+          zIndex: 300,
+          background: "var(--coal)",
+          border: "var(--bd)",
+          color: "var(--cream)",
+          cursor: "pointer",
+          padding: "7px 10px",
+          display: "none",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Menu size={16} />
+      </button>
+
+      {/* Mobile overlay + drawer */}
+      {open && (
+        <div
+          onClick={() => setOpen(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 250,
+            background: "rgba(14,13,10,0.7)",
+            backdropFilter: "blur(2px)",
+            display: "flex",
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <SidebarContent />
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @media (max-width: 768px) {
+          .sidebar-desktop { display: none !important; }
+          .sidebar-hamburger { display: flex !important; }
+        }
+        @media (min-width: 769px) {
+          .sidebar-desktop { display: flex !important; height: 100vh; position: sticky; top: 0; }
+          .sidebar-hamburger { display: none !important; }
+        }
+      `}</style>
+    </>
   );
 }

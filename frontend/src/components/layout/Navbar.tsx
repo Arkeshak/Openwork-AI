@@ -46,7 +46,9 @@ export default function Navbar({ title }: { title?: string }) {
   const initials = profile?.username ? profile.username.slice(0, 2).toUpperCase() : "—";
 
   return (
+    <>
     <header
+      className="app-navbar"
       style={{
         height: 52,
         display: "flex",
@@ -82,7 +84,7 @@ export default function Navbar({ title }: { title?: string }) {
       </div>
 
       {/* Search */}
-      <div ref={searchRef} style={{ flex: 1, maxWidth: 400, position: "relative" }}>
+      <div ref={searchRef} className="navbar-search" style={{ flex: 1, maxWidth: 400, position: "relative" }}>
         <div
           style={{
             display: "flex",
@@ -240,5 +242,18 @@ export default function Navbar({ title }: { title?: string }) {
         </div>
       </div>
     </header>
+    <style>{`
+      @media (max-width: 768px) {
+        .app-navbar {
+          padding-left: 52px !important;
+        }
+      }
+      @media (max-width: 480px) {
+        .app-navbar .navbar-search {
+          max-width: 140px !important;
+        }
+      }
+    `}</style>
+    </>
   );
 }
