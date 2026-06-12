@@ -76,7 +76,7 @@ export default function ChatWindow({ workspaceId, chatId }: Props) {
       const apiBase =
         typeof window !== "undefined"
           ? `${window.location.origin}${process.env.NEXT_PUBLIC_API_URL || "/api"}`
-          : process.env.BACKEND_URL || "http://127.0.0.1:8000";
+          : process.env.BACKEND_URL || "https://openwork-ai-production.up.railway.app";
       const response = await fetch(
         `${apiBase}/workspaces/${workspaceId}/chats/${chatId}/rag-stream`,
         {

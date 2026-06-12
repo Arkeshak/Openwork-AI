@@ -9,7 +9,7 @@ const BASE_URL =
     : process.env.BACKEND_URL;
 
 export const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: "https://openwork-ai-production.up.railway.app",
 });
 
 // Attach JWT token to every request
