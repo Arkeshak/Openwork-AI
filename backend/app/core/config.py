@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     JWT_SECRET: str = "openwork-ai-secret-key"
     GEMINI_API_KEY: str
-    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001,http://localhost:8000"
+    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001,http://localhost:8000,https://openwork-ai-dusky.vercel.app"
 
     class Config:
         env_file = ".env"
