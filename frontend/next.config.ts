@@ -4,14 +4,11 @@ const BACKEND_URL = process.env.BACKEND_URL;
 
 const nextConfig: NextConfig = {
   async rewrites() {
-    if (!BACKEND_URL) {
-      console.warn("WARNING: BACKEND_URL environment variable is not set. API rewrites will not be active.");
-      return [];
-    }
+    const targetUrl = BACKEND_URL || "https://openwork-ai-production.up.railway.app";
     return [
       {
         source: "/api/:path*",
-        destination: `${BACKEND_URL}/:path*`,
+        destination: `${targetUrl}/:path*`,
       },
     ];
   },

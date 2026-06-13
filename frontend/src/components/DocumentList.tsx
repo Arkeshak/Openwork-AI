@@ -243,7 +243,7 @@ export default function DocumentList({ workspaceId, refresh }: Props) {
                     : <RefreshCw size={12} />}
                 </button>
                 <a
-                  href={`${(process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL.startsWith("http")) ? process.env.NEXT_PUBLIC_API_URL : "https://openwork-ai-production.up.railway.app"}/documents/${doc.id}/download`}
+                  href={`/api/documents/${doc.id}/download`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
