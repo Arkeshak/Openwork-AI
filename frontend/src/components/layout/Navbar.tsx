@@ -6,21 +6,13 @@ import Link from "next/link";
 import { api } from "../../services/api";
 import { Workspace } from "../../types/workspace";
 
-interface Profile { id: number; username: string; email: string; }
 
 export default function Navbar({ title }: { title?: string }) {
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Workspace[]>([]);
   const [showSearch, setShowSearch] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const load = async () => {
-      try { const res = await api.get("/auth/me"); setProfile(res.data); } catch { /* ignore */ }
-    };
-    load();
-  }, []);
 
   useEffect(() => {
     if (!query.trim()) { setResults([]); return; }
@@ -43,7 +35,6 @@ export default function Navbar({ title }: { title?: string }) {
     return () => document.removeEventListener("mousedown", h);
   }, []);
 
-  const initials = profile?.username ? profile.username.slice(0, 2).toUpperCase() : "—";
 
   return (
     <>
@@ -189,58 +180,7 @@ export default function Navbar({ title }: { title?: string }) {
         )}
       </div>
 
-      {/* Right: user */}
-      <div className="flex items-center gap-4 shrink-0">
-        <button className="ed-btn-ghost ed-btn-icon" style={{ color: "var(--mist)" }}>
-          <Bell size={14} />
-        </button>
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            borderLeft: "var(--bd)",
-            paddingLeft: 16,
-          }}
-        >
-          <div
-            style={{
-              width: 28,
-              height: 28,
-              background: "var(--amber)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "var(--font-display)",
-              fontWeight: 900,
-              fontSize: "0.75rem",
-              color: "var(--ink)",
-              letterSpacing: "-0.01em",
-              flexShrink: 0,
-            }}
-          >
-            {initials}
-          </div>
-          <div className="hidden md:block">
-            <div
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: "0.68rem",
-                color: "var(--cream)",
-                textTransform: "uppercase",
-                letterSpacing: "0.06em",
-                lineHeight: 1,
-              }}
-            >
-              {profile?.username || "—"}
-            </div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.58rem", color: "var(--mist)", lineHeight: 1.5, letterSpacing: "0.04em" }}>
-              Active
-            </div>
-          </div>
-        </div>
-      </div>
     </header>
     <style>{`
       @media (max-width: 768px) {

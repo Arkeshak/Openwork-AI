@@ -296,7 +296,7 @@ export default function WorkspacePage() {
             </>
           ) : (
             /* Documents tab */
-            <div style={{ flex: 1, padding: 32, overflowY: "auto" }}>
+            <div className="docs-tab-container" style={{ flex: 1, overflowY: "auto" }}>
               <div style={{ maxWidth: 800, display: "flex", flexDirection: "column", gap: 24 }}>
                 {/* Upload area */}
                 <div>

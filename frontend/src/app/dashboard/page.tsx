@@ -91,6 +91,48 @@ export default function DashboardPage() {
 
         <main style={{ flex: 1 }}>
 
+          {/* ── Welcome / Onboarding Section ── */}
+          <div className="onboarding-section animate-fade-in">
+            <div className="onboarding-content">
+              <h1 className="onboarding-title">Welcome to OpenWork AI</h1>
+              <p className="onboarding-desc">
+                Transform your static local documents into an intelligent, conversational knowledge base.
+                Simply create a workspace, upload your files, and instantly start extracting insights with precise citations.
+              </p>
+              
+              <div className="onboarding-grid">
+                <div className="onboarding-card">
+                  <div className="label" style={{ color: "var(--amber)", marginBottom: 12 }}>How It Works</div>
+                  <ul className="onboarding-list">
+                    <li><span className="step-num">1</span> <strong>Create</strong> a new workspace</li>
+                    <li><span className="step-num">2</span> <strong>Upload</strong> PDF or TXT documents</li>
+                    <li><span className="step-num">3</span> <strong>Chat</strong> naturally with your data</li>
+                    <li><span className="step-num">4</span> <strong>Extract</strong> actionable insights</li>
+                  </ul>
+                </div>
+
+                <div className="onboarding-card">
+                  <div className="label" style={{ color: "var(--amber)", marginBottom: 12 }}>What You'll Get</div>
+                  <ul className="onboarding-list benefits-list">
+                    <li>✓ Instant, accurate answers from your texts</li>
+                    <li>✓ Verifiable citations for every claim</li>
+                    <li>✓ 100% local, privacy-first processing</li>
+                    <li>✓ Blazing fast brutalist workflow</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div className="onboarding-action">
+              <button 
+                onClick={() => setShowModal(true)} 
+                className="ed-btn ed-btn-primary" 
+                style={{ width: "100%", padding: "16px", fontSize: "1rem" }}
+              >
+                Create Workspace →
+              </button>
+            </div>
+          </div>
+
           {/* ── Stats row ── */}
           <div className="stats-grid">
             {stats.map((s, i) => (
@@ -499,6 +541,81 @@ export default function DashboardPage() {
           min-width: 0;
         }
 
+        /* Onboarding Section */
+        .onboarding-section {
+          padding: 32px 24px;
+          border-bottom: var(--bd);
+          background: var(--soot);
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+        }
+        .onboarding-content {
+          max-width: 800px;
+        }
+        .onboarding-title {
+          font-family: var(--font-display);
+          font-weight: 900;
+          font-size: clamp(1.8rem, 4vw, 2.5rem);
+          text-transform: uppercase;
+          color: var(--cream);
+          margin-bottom: 12px;
+          line-height: 1.1;
+          letter-spacing: -0.02em;
+        }
+        .onboarding-desc {
+          color: var(--mist);
+          font-size: 1.05rem;
+          line-height: 1.6;
+          margin-bottom: 32px;
+          max-width: 600px;
+        }
+        .onboarding-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 24px;
+        }
+        .onboarding-card {
+          background: var(--coal);
+          border: var(--bd);
+          padding: 24px;
+        }
+        .onboarding-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .onboarding-list li {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          color: var(--sand);
+          font-size: 0.9rem;
+        }
+        .step-num {
+          background: var(--amber);
+          color: var(--ink);
+          font-weight: 900;
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 2px;
+          font-size: 0.8rem;
+          flex-shrink: 0;
+        }
+        .benefits-list li {
+          color: var(--cream);
+        }
+        .onboarding-action {
+          max-width: 300px;
+          margin-top: 8px;
+        }
+
         /* Stats grid: 4 columns on desktop, 2 on tablet, 2 on mobile */
         .stats-grid {
           display: grid;
@@ -557,10 +674,23 @@ export default function DashboardPage() {
           .right-panel {
             border-top: none;
           }
+          .onboarding-grid {
+            grid-template-columns: 1fr;
+          }
         }
 
         /* ── Mobile (≤600px) ── */
         @media (max-width: 600px) {
+          .onboarding-section {
+            padding: 20px 16px;
+            gap: 16px;
+          }
+          .onboarding-card {
+            padding: 16px;
+          }
+          .onboarding-action {
+            max-width: 100%;
+          }
           .stats-grid {
             grid-template-columns: repeat(2, 1fr);
           }

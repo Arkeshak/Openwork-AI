@@ -481,7 +481,14 @@ input, textarea, select { font-family: var(--font-body); }
   grid-template-columns: 32px 1fr 90px 90px 120px;
 }
 
+.docs-tab-container {
+  padding: 32px;
+}
+
 @media (max-width: 600px) {
+  .docs-tab-container {
+    padding: 16px;
+  }
   .doc-grid-row {
     grid-template-columns: 32px 1fr 110px;
   }

@@ -183,7 +183,7 @@ export default function ChatWindow({ workspaceId, chatId }: Props) {
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
       {/* Messages */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "28px 32px", display: "flex", flexDirection: "column", gap: 0 }}>
+      <div className="chat-messages-container" style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 0 }}>
 
         {messages.length === 0 && (
           <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, padding: 48 }}>
