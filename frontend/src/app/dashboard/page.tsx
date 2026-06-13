@@ -6,6 +6,8 @@ import { Plus, ArrowRight, Trash2, X, Loader2, MessageSquare } from "lucide-reac
 import toast from "react-hot-toast";
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/layout/Navbar";
+import SplashSequence from "../../components/SplashSequence";
+import Footer from "../../components/layout/Footer";
 import { api } from "../../services/api";
 import { Workspace } from "../../types/workspace";
 
@@ -81,6 +83,7 @@ export default function DashboardPage() {
 
   return (
     <div className="dashboard-root">
+      <SplashSequence />
       <Sidebar />
 
       <div className="dashboard-body">
@@ -383,6 +386,7 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
+          <Footer />
         </main>
       </div>
 

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutGrid, Settings, LogOut, Menu, X } from "lucide-react";
+import { LayoutGrid, Settings, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const nav = [
@@ -30,10 +30,6 @@ export default function Sidebar() {
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    router.push("/login");
-  };
 
   const handleNavClick = (item: typeof nav[0]) => {
     setOpen(false);
@@ -155,12 +151,8 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Bottom — version + logout */}
+      {/* Bottom — version */}
       <div style={{ borderTop: "var(--bd)", padding: "12px 0" }}>
-        <button onClick={logout} className="nav-item" style={{ color: "var(--ember)" }}>
-          <LogOut size={13} />
-          Logout
-        </button>
         <div
           style={{
             padding: "8px 24px 0",

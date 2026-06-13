@@ -136,9 +136,8 @@ export default function DocumentList({ workspaceId, refresh }: Props) {
     <div>
       {/* Column header */}
       <div
+        className="doc-grid-row"
         style={{
-          display: "grid",
-          gridTemplateColumns: "32px 1fr 90px 90px 120px",
           padding: "6px 12px",
           borderBottom: "var(--bd)",
           background: "var(--coal)",
@@ -153,10 +152,8 @@ export default function DocumentList({ workspaceId, refresh }: Props) {
       {docs.map((doc, i) => (
         <div
           key={doc.id}
-          className="animate-fade-up"
+          className="doc-grid-row animate-fade-up"
           style={{
-            display: "grid",
-            gridTemplateColumns: "32px 1fr 90px 90px 120px",
             alignItems: "center",
             padding: "0 12px",
             minHeight: 52,

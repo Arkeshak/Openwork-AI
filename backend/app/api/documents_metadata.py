@@ -78,7 +78,7 @@ def delete_document(
         return {"error": "Document not found"}
 
     workspace = db.query(Workspace).filter(Workspace.id == document.workspace_id).first()
-    if workspace.user_id != user["user_id"]:
+    if not workspace or workspace.user_id != user["user_id"]:
         return {"error": "Access denied"}
 
     db.delete(document)
@@ -127,7 +127,7 @@ def upload_document_legacy(
         text = load_document(file_path)
         if text and text.strip():
             print(f"DOCUMENT EXTRACTED: {len(text)} characters")
-            RAGService.ingest_text(text, workspace_id, filename=file.filename)
+            RAGService.ingest_text(text, workspace_id, filename=file.filename or "unknown")
             print("DOCUMENT INGESTED SUCCESSFULLY")
         else:
             print("No text extracted from document")
@@ -187,7 +187,7 @@ def upload_document_to_workspace(
         text = load_document(file_path)
         if text and text.strip():
             print(f"DOCUMENT EXTRACTED: {len(text)} characters")
-            RAGService.ingest_text(text, workspace_id, filename=file.filename)
+            RAGService.ingest_text(text, workspace_id, filename=file.filename or "unknown")
             print("DOCUMENT INGESTED SUCCESSFULLY")
         else:
             print("No text extracted from document")
@@ -215,10 +215,13 @@ def download_document(
         return {"error": "Document not found"}
 
     workspace = db.query(Workspace).filter(Workspace.id == document.workspace_id).first()
-    if workspace.user_id != user["user_id"]:
+    if not workspace or workspace.user_id != user["user_id"]:
         return {"error": "Access denied"}
 
-    return FileResponse(path=document.file_path, filename=document.filename)
+    if not document.file_path:
+        return {"error": "File path not found"}
+
+    return FileResponse(path=str(document.file_path), filename=str(document.filename) if document.filename else None)
 
 
 # ── Re-ingest a document into ChromaDB ───────────────────────────────────────
@@ -237,15 +240,15 @@ def reingest_document(
     if not workspace or workspace.user_id != user["user_id"]:
         raise HTTPException(status_code=403, detail="Access denied")
 
-    if not document.file_path or not os.path.exists(document.file_path):
+    if not document.file_path or not os.path.exists(str(document.file_path)):
         raise HTTPException(status_code=404, detail="File not found on disk. Please re-upload.")
 
     try:
-        text = load_document(document.file_path)
+        text = load_document(str(document.file_path))
         if not text or not text.strip():
             raise HTTPException(status_code=422, detail="Could not extract text from document.")
 
-        RAGService.ingest_text(text, document.workspace_id, filename=document.filename)
+        RAGService.ingest_text(text, int(document.workspace_id), filename=str(document.filename) if document.filename else "unknown")
         return {
             "message": "Re-ingested successfully",
             "document_id": document_id,

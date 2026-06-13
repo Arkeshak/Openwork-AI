@@ -99,18 +99,7 @@ export default function ChatSidebar({
   );
 
   return (
-    <div
-      style={{
-        width: 240,
-        flexShrink: 0,
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        borderRight: "var(--bd)",
-        background: "var(--coal)",
-        overflow: "hidden",
-      }}
-    >
+    <div className="chat-sidebar">
       {/* Header */}
       <div style={{ padding: "14px 14px 10px", borderBottom: "var(--bd)" }}>
         <div className="label" style={{ marginBottom: 10 }}>Conversations</div>

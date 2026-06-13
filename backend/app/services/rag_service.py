@@ -88,9 +88,9 @@ class RAGService:
                 n_results=fetch_k,
                 include=["documents", "distances", "metadatas"]
             )
-            docs = results.get("documents", [[]])[0] or []
-            dists = results.get("distances", [[]])[0] or []
-            metas = results.get("metadatas", [[]])[0] or []
+            docs = (results.get("documents") or [[]])[0] or []
+            dists = (results.get("distances") or [[]])[0] or []
+            metas = (results.get("metadatas") or [[]])[0] or []
 
             filtered_docs, filtered_dists, filtered_metas = [], [], []
             for d, dist, m in zip(docs, dists, metas):

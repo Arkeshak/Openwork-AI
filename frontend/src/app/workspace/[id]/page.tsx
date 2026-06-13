@@ -11,6 +11,7 @@ import ChatSidebar from "../../../components/ChatSidebar";
 import ChatWindow from "../../../components/ChatWindow";
 import UploadButton from "../../../components/UploadButton";
 import DocumentList from "../../../components/DocumentList";
+import Footer from "../../../components/layout/Footer";
 
 interface Workspace { id: number; name: string; description?: string; created_at?: string; }
 interface Stats { documents: number; chats: number; messages: number; }
@@ -218,7 +219,7 @@ export default function WorkspacePage() {
           </div>
 
           {/* Stats strip */}
-          <div style={{ display: "flex", gap: 0, marginTop: 20 }}>
+          <div style={{ display: "flex", gap: 0, marginTop: 20, flexWrap: "wrap" }}>
             {wsStats.map((s, i) => (
               <div
                 key={s.label}
@@ -278,7 +279,7 @@ export default function WorkspacePage() {
         </div>
 
         {/* ── Main content ── */}
-        <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+        <div className="workspace-content">
 
           {activeTab === "chat" ? (
             <>
@@ -344,6 +345,7 @@ export default function WorkspacePage() {
             </div>
           )}
         </div>
+        <Footer />
       </div>
     </div>
   );

@@ -99,10 +99,10 @@ def update_workspace(
         raise HTTPException(status_code=403, detail="Access denied")
 
     if payload.name is not None:
-        workspace.name = payload.name
+        setattr(workspace, "name", payload.name)
 
     if payload.description is not None:
-        workspace.description = payload.description
+        setattr(workspace, "description", payload.description)
 
     db.commit()
     db.refresh(workspace)
@@ -135,20 +135,24 @@ def delete_workspace(
         raise HTTPException(status_code=403, detail="Access denied")
 
     # Cascade: delete messages -> chats -> documents -> workspace
-    chats = (
-        db.query(WorkspaceChat)
+    chat_ids = [
+        chat_id[0] for chat_id in db.query(WorkspaceChat.id)
         .filter(WorkspaceChat.workspace_id == workspace_id)
         .all()
-    )
-    for chat in chats:
+    ]
+    
+    if chat_ids:
         db.query(WorkspaceMessage).filter(
-            WorkspaceMessage.chat_id == chat.id
-        ).delete()
-        db.delete(chat)
+            WorkspaceMessage.chat_id.in_(chat_ids)
+        ).delete(synchronize_session=False)
+        
+    db.query(WorkspaceChat).filter(
+        WorkspaceChat.workspace_id == workspace_id
+    ).delete(synchronize_session=False)
 
     db.query(Document).filter(
         Document.workspace_id == workspace_id
-    ).delete()
+    ).delete(synchronize_session=False)
 
     db.delete(workspace)
     db.commit()

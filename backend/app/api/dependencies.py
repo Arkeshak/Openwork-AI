@@ -10,25 +10,6 @@ from app.core.security import (
 security = HTTPBearer()
 
 
-def get_current_user(
-    credentials=Depends(security)
-):
-
-    token = credentials.credentials
-
-    try:
-
-        payload = jwt.decode(
-            token,
-            SECRET_KEY,
-            algorithms=[ALGORITHM]
-        )
-
-        return payload
-
-    except Exception:
-
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid token"
-        )
+def get_current_user():
+    # Authentication temporarily disabled for public beta
+    return {"user_id": 1, "username": "Public Beta", "email": "public@openwork.ai"}

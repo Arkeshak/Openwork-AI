@@ -58,8 +58,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from app.database.database import SessionLocal
+import app.core.security as security
+
 Base.metadata.create_all(bind=engine)
 
+@app.on_event("startup")
+def startup_event():
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.id == 1).first()
+        if not user:
+            default_user = User(
+                id=1,
+                email="public@openwork.ai",
+                hashed_password=security.hash_password("public_dummy_password_xyz"),
+                is_active=True
+            )
+            db.add(default_user)
+            db.commit()
+    except Exception as e:
+        print(f"Failed to seed default user: {e}")
+    finally:
+        db.close()
 
 @app.get("/")
 def home():
