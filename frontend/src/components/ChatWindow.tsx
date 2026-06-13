@@ -73,7 +73,8 @@ export default function ChatWindow({ workspaceId, chatId }: Props) {
 
     try {
       const token = localStorage.getItem("token");
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://openwork-ai-production.up.railway.app";
+      const envUrl = process.env.NEXT_PUBLIC_API_URL;
+      const apiBase = (envUrl && envUrl.startsWith("http")) ? envUrl : "https://openwork-ai-production.up.railway.app";
       const response = await fetch(
         `${apiBase}/workspaces/${workspaceId}/chats/${chatId}/rag-stream`,
         {
