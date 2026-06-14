@@ -30,7 +30,6 @@ export default function WorkspacePage() {
   const [saving, setSaving] = useState(false);
   const [selectedChatId, setSelectedChatId] = useState<number | undefined>();
   const [chatRefresh, setChatRefresh] = useState(0);
-  const [activeTab, setActiveTab] = useState<"chat" | "docs">("chat");
   const [docRefresh, setDocRefresh] = useState(0);
 
   const loadWorkspace = useCallback(async () => {
@@ -250,100 +249,71 @@ export default function WorkspacePage() {
               </div>
             ))}
 
-            {/* Tab switcher */}
-            <div style={{ marginLeft: "auto", display: "flex", borderTop: "var(--bd)", borderLeft: "var(--bd)" }}>
-              {(["chat", "docs"] as const).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  style={{
-                    padding: "10px 20px",
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "0.65rem",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    color: activeTab === tab ? "var(--amber)" : "var(--mist)",
-                    background: activeTab === tab ? "rgba(240,165,32,0.06)" : "transparent",
-                    border: "none",
-                    borderRight: tab === "chat" ? "var(--bd)" : "none",
-                    borderBottom: activeTab === tab ? "2px solid var(--amber)" : "2px solid transparent",
-                    cursor: "pointer",
-                    transition: "all 0.15s",
-                  }}
-                >
-                  {tab === "chat" ? <><MessageSquare style={{ display: "inline", marginRight: 4 }} size={10} /> Chat</> : <><FileText style={{ display: "inline", marginRight: 4 }} size={10} /> Docs</>}
-                </button>
-              ))}
-            </div>
+            {/* Tab switcher removed for unified view */}
           </div>
         </div>
 
-        {/* ── Main content ── */}
-        <div className="workspace-content">
+        {/* ── Main content (Unified Layout) ── */}
+        <div className="workspace-content" style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+          
+          {/* Left Column: Chats */}
+          <ChatSidebar
+            workspaceId={workspaceId}
+            selectedChatId={selectedChatId}
+            onSelectChat={(cid) => setSelectedChatId(cid || undefined)}
+            refresh={chatRefresh}
+            onRefresh={() => setChatRefresh((n) => n + 1)}
+          />
 
-          {activeTab === "chat" ? (
-            <>
-              {/* Chat sidebar */}
-              <ChatSidebar
-                workspaceId={workspaceId}
-                selectedChatId={selectedChatId}
-                onSelectChat={(cid) => setSelectedChatId(cid || undefined)}
-                refresh={chatRefresh}
-                onRefresh={() => setChatRefresh((n) => n + 1)}
-              />
-              {/* Chat window */}
-              <ChatWindow workspaceId={workspaceId} chatId={selectedChatId} />
-            </>
-          ) : (
-            /* Documents tab */
-            <div className="docs-tab-container" style={{ flex: 1, overflowY: "auto" }}>
-              <div style={{ maxWidth: 800, display: "flex", flexDirection: "column", gap: 24 }}>
-                {/* Upload area */}
-                <div>
-                  <div className="flex items-center justify-between" style={{ marginBottom: 16 }}>
-                    <h3
-                      style={{
-                        fontFamily: "var(--font-display)",
-                        fontWeight: 900,
-                        fontSize: "1.2rem",
-                        textTransform: "uppercase",
-                        letterSpacing: "-0.01em",
-                        color: "var(--cream)",
-                      }}
-                    >
-                      Upload Document
-                    </h3>
-                    <span className="ed-badge ed-badge-amber">PDF / TXT</span>
-                  </div>
-                  <UploadButton
-                    workspaceId={workspaceId}
-                    onUpload={() => setDocRefresh((n) => n + 1)}
-                  />
-                </div>
+          {/* Center Column: Chat Window */}
+          <ChatWindow workspaceId={workspaceId} chatId={selectedChatId} />
 
-                <hr className="ed-rule" />
-
-                {/* Document list */}
-                <div>
-                  <div className="flex items-center gap-2" style={{ marginBottom: 16 }}>
-                    <h3
-                      style={{
-                        fontFamily: "var(--font-display)",
-                        fontWeight: 900,
-                        fontSize: "1.2rem",
-                        textTransform: "uppercase",
-                        letterSpacing: "-0.01em",
-                        color: "var(--cream)",
-                      }}
-                    >
-                      Documents
-                    </h3>
-                  </div>
-                  <DocumentList workspaceId={workspaceId} refresh={docRefresh} />
-                </div>
-              </div>
+          {/* Right Column: Knowledge Base (Documents) */}
+          <div 
+            className="docs-sidebar" 
+            style={{ 
+              width: "300px", 
+              borderLeft: "1px solid rgba(255,255,255,0.08)", 
+              background: "var(--coal)", 
+              display: "flex", 
+              flexDirection: "column",
+              flexShrink: 0,
+              padding: "24px 20px"
+            }}
+          >
+            <div className="flex items-center justify-between" style={{ marginBottom: 16 }}>
+              <h3
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 900,
+                  fontSize: "1.2rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "-0.01em",
+                  color: "var(--cream)",
+                }}
+              >
+                Knowledge Base
+              </h3>
             </div>
-          )}
+            
+            <UploadButton
+              workspaceId={workspaceId}
+              onUpload={() => {
+                setDocRefresh((n) => n + 1);
+                loadWorkspace();
+              }}
+            />
+
+            <hr className="ed-rule" style={{ margin: "24px 0" }} />
+
+            <div style={{ flex: 1, overflowY: "auto" }}>
+              <div className="flex items-center gap-2" style={{ marginBottom: 16 }}>
+                <div className="label">Indexed Documents</div>
+              </div>
+              <DocumentList workspaceId={workspaceId} refresh={docRefresh} />
+            </div>
+          </div>
+
         </div>
         <Footer />
       </div>

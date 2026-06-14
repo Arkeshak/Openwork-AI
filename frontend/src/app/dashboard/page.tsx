@@ -75,7 +75,7 @@ export default function DashboardPage() {
   };
 
   const stats = [
-    { label: "Workspaces", value: data?.workspaces ?? 0 },
+    { label: "Knowledge Bases", value: data?.workspaces ?? 0 },
     { label: "Documents",  value: data?.documents  ?? 0 },
     { label: "Chats",      value: data?.chats       ?? 0 },
     { label: "Messages",   value: data?.messages    ?? 0 },
@@ -128,7 +128,7 @@ export default function DashboardPage() {
                 className="ed-btn ed-btn-primary" 
                 style={{ width: "100%", padding: "16px", fontSize: "1rem" }}
               >
-                Create Workspace →
+                Create Knowledge Base →
               </button>
             </div>
           </div>
@@ -192,7 +192,7 @@ export default function DashboardPage() {
                       lineHeight: 1,
                     }}
                   >
-                    Workspaces
+                    Knowledge Bases
                   </h2>
                   {data && (
                     <span className="ed-badge ed-badge-amber">
@@ -230,10 +230,10 @@ export default function DashboardPage() {
                     Empty
                   </div>
                   <p style={{ color: "var(--mist)", fontSize: "var(--text-sm)", maxWidth: 340 }}>
-                    No workspaces yet. Create one to start uploading documents and chatting with your data.
+                    No knowledge bases yet. Create one to start uploading documents and chatting with your data.
                   </p>
                   <button onClick={() => setShowModal(true)} className="ed-btn ed-btn-outline" style={{ marginTop: 8 }}>
-                    <Plus size={12} /> Create First Workspace
+                    <Plus size={12} /> Create First Knowledge Base
                   </button>
                 </div>
               ) : (
@@ -466,7 +466,7 @@ export default function DashboardPage() {
               <div>
                 <div className="label" style={{ color: "var(--amber)", marginBottom: 4 }}>◆ New Record</div>
                 <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.2rem, 5vw, 1.6rem)", fontWeight: 900, textTransform: "uppercase", lineHeight: 1, color: "var(--cream)" }}>
-                  Create Workspace
+                  New Knowledge Base
                 </h2>
               </div>
               <button onClick={() => setShowModal(false)} className="ed-btn ed-btn-ghost ed-btn-icon">
