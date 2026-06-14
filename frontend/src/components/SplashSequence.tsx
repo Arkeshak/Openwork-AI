@@ -15,7 +15,7 @@ export default function SplashSequence() {
       } else {
         sessionStorage.setItem("hasSeenSplash", "true");
         // Auto-hide after sequence
-        const t = setTimeout(() => setShow(false), 3800);
+        const t = setTimeout(() => setShow(false), 4500);
         return () => clearTimeout(t);
       }
     }
@@ -132,6 +132,23 @@ export default function SplashSequence() {
                 }}
               >
                 Transforming documents into a conversational knowledge base.
+              </motion.p>
+
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 2.2, duration: 0.8, ease: "easeOut" }}
+                style={{
+                  color: "var(--amber)",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "0.75rem",
+                  letterSpacing: "0.1em",
+                  marginTop: 32,
+                  textTransform: "uppercase",
+                  opacity: 0.8,
+                }}
+              >
+                Developed by @arkeshak
               </motion.p>
             </div>
           </motion.div>
