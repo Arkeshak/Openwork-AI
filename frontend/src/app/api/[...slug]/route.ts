@@ -25,7 +25,7 @@ async function handleProxy(req: NextRequest, params: { slug: string[] }) {
   const url = new URL(req.url);
   const searchParams = url.searchParams.toString();
   
-  const backendUrl = process.env.BACKEND_URL || "https://openwork-ai-production.up.railway.app";
+  const backendUrl = process.env.BACKEND_URL || "https://openwork-ai-production-61b2.up.railway.app";
   const target = `${backendUrl}/${path}${searchParams ? `?${searchParams}` : ""}`;
 
   try {
